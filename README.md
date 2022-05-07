@@ -40,6 +40,11 @@ service.yml<br> </b>
 * After connecting to the cluster, you can install Ingress through the command  <br> <b> kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml </b>
 
 * In Azure devops, need to create pool and agent machine to run CI as well as create an Environment and authorize the kubernetes service cluster
+<hr>
+<b>Screenshots of variables and kubernetes environment </b>(click to enlarge the image) <br>
+[link var](https://user-images.githubusercontent.com/85096533/167261485-b8a20028-1453-47f7-bf21-ad1451c2db1b.jpg) <br>
+[link environment](https://user-images.githubusercontent.com/85096533/167261491-6bfa4dce-b064-4a7d-96b8-bf449a2f4b81.jpg) <br>
+
 
 <hr>
 <b> Kubernetes commands: </b> <br>
