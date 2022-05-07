@@ -1,0 +1,26 @@
+apiVersion : apps/v1
+kind: Deployment
+metadata:
+  name: appkube 
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: appkube
+  template:
+    metadata:
+      labels:
+        app: appkube 
+    spec:
+      containers:
+        - name: appkube 
+          image: artemrafikov2.azurecr.io/bootcampapp:latest
+          imagePullPolicy: "Always"
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          envFrom: 
+          - configMapRef:
+             name: appkube-configmap.yml
+          - secretRef:
+             name: appkube-secrets.yml

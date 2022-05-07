@@ -1,0 +1,103 @@
+trigger:
+  branches:
+    include:
+    - master
+    - feature/*
+pool:
+  name: kub-pool
+variables:
+- name: dockerRegistryServiceConnection
+  value: '7068adbe-cc7e-4717-9934-640f4f1d629f'
+- name: imageRepository
+  value: 'bootcampapp'
+- name: containerRegistry
+  value: 'artemrafikov2.azurecr.io'
+- name: dockerfilePath
+  value: '**/app/Dockerfile'
+- name: tag
+  value: 'latest'
+- name: artifactName
+  value: 'manifests'
+- name: imagePullSecret
+  value: 'superawesomebrilliantsecret-auth'
+stages:
+- stage: CI
+  jobs:
+  - job: BuildAndPushDocker
+    steps:
+    - task: Docker@2
+      displayName: build image
+      inputs:
+        containerRegistry: 'artemrafikov2'
+        repository: '$(imageRepository)'
+        command: 'build'
+        Dockerfile: '$(dockerfilePath)'
+        tags: 'latest'
+    - task: Docker@2
+      displayName: Push to ACR
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+      inputs:
+        containerRegistry: 'artemrafikov2'
+        repository: '$(imageRepository)'
+        command: 'Push'
+        tags: 'latest'
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)/s/k8s'
+        artifact: '$(artifactName)'
+        publishLocation: 'pipeline'
+- stage: Deploy
+  displayName: Deploy to Production
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  variables:
+  - group: var-kuber
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to AKS'
+    environment:
+      name: 'k8s-production.default'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              artifactName: '$(artifactName)'
+              targetPath: '$(Pipeline.Workspace)/manifests'
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'createSecret'
+              namespace: 'default'
+              secretType: 'dockerRegistry'
+              secretName: '$(imagePullSecret)'
+              dockerRegistryEndpoint: 'artemrafikov2'
+          - task: Kubernetes@1
+            displayName: Create configMap
+            inputs:
+              kubernetesServiceConnection: 'k8s-production-kuber3-default-1651904330732'
+              configMapName: 'appkube-configmap.yml'
+              forceUpdateConfigMap: true
+              configMapArguments: |
+                --from-literal=HOST=$(HOST) --from-literal=NODE_ENV=$(NODE_ENV) --from-literal=PGHOST=$(PGHOST) --from-literal=OKTA_ORG_URL=$(OKTA_ORG_URL) --from-literal=PGPORT=$(PGPORT) --from-literal=PORT=$(PORT)
+          - task: KubernetesManifest@0
+            displayName: Create secrets
+            inputs:
+              action: 'createSecret'
+              kubernetesServiceConnection: 'k8s-production-kuber3-default-1651904330732'
+              secretType: 'generic'
+              secretName: 'appkube-secrets.yml'
+              secretArguments: |
+                --from-literal=COOKIE_ENCRYPT_PWD=$(COOKIE_ENCRYPT_PWD) --from-literal=HOST_URL=$(HOST_URL) --from-literal=OKTA_CLIENT_ID=$(OKTA_CLIENT_ID) --from-literal=OKTA_CLIENT_SECRET=$(OKTA_CLIENT_SECRET) --from-literal=PGDATABASE=$(PGDATABASE) --from-literal=PGPASSWORD=$(PGPASSWORD) --from-literal=PGUSERNAME=$(PGUSERNAME)
+          - task: KubernetesManifest@0
+            inputs:
+              action: 'deploy'
+              kubernetesServiceConnection: 'k8s-production-kuber3-default-1651904330732'
+              namespace: 'default'
+              manifests: |
+                $(Pipeline.Workspace)/manifests/deployment.yml
+                $(Pipeline.Workspace)/manifests/ingress.yml
+                $(Pipeline.Workspace)/manifests/service.yml
+              containers: '$(containerRegistry)/$(imageRepository):latest'
+              imagePullSecrets: $(imagePullSecret)
+
