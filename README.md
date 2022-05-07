@@ -1,6 +1,6 @@
 # Kubernetes + CI/CD Pipeline Azure DevOps
 
-<b> First of all I will create a Kubernetes Cluster in Microsoft’s Azure Kubernetes Service (AKS) for the project infrastructure. </b>
+<b> First of all need to create a Kubernetes Cluster in Microsoft’s Azure Kubernetes Service (AKS) for the project infrastructure. </b>
 
 ![kubernetes-resources](https://user-images.githubusercontent.com/85096533/167258834-ee26bc35-2649-4f83-8374-156d447872f5.png)
 
