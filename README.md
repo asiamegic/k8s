@@ -37,12 +37,13 @@ service.yml<br> </b>
 * Download kube cli -  [link](https://kubernetes.io/docs/tasks/tools/)  
 * Authorize azure kubernetes cluster - <b> az aks get-credentials --name MyManagedCluster --resource-group MyResourceGroup </b>
 
-* After connecting to the cluster, you can install IGNES through the command  <br> <b> kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml </b>
+* After connecting to the cluster, you can install Ingress through the command  <br> <b> kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml </b>
 
 * In Azure devops, need to create pool and agent machine to run CI as well as create an Environment and authorize the kubernetes service cluster
 
 <hr>
 <b> Kubernetes commands: </b> <br>
+
 <b>kubectl get services </b> - view active NODES  <br>
 <b>kubectl get pods </b>- view active pods  <br>
 <b>kubectl delete all --all  </b>  - clear the cluster completely  <br>
