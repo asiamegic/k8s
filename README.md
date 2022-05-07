@@ -16,7 +16,7 @@ service.yml<br> </b>
 <b>This is how the structure of the entire stages of CI/CD looks like. </b> <br></b>
 <b>CI :</b>  <br>
 1 - Build a container. <br>
-2 - Upload the container to the repository.  <br>
+2 - Upload the container to the ACR repository.  <br>
 3 - Upload artifacts of config files to the repository.  <br>
 
 <b>CD : </b> <br>
